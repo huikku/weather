@@ -86,13 +86,13 @@ export default function App() {
             </div>
 
             {/* Middle Column (Radar, Hourly) */}
-            <div className="lg:col-span-5 flex flex-col gap-4 sm:gap-6 order-first md:order-none">
+            <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6 order-first md:order-none">
               {location && <RadarMap lat={location.lat} lon={location.lon} />}
               <HourlyForecast weather={weather} />
             </div>
 
             {/* Right Column (Daily) */}
-            <div className="lg:col-span-3 flex flex-col gap-4 sm:gap-6 md:col-span-2 lg:col-span-3">
+            <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6 md:col-span-2 lg:col-span-4">
               <DailyForecast weather={weather} />
             </div>
 
