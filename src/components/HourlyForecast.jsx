@@ -29,30 +29,44 @@ export function HourlyForecast({ weather }) {
     });
 
     return (
-        <section className="mb-5">
-            <h2 className="font-heading font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">
+        <section className="mb-5 lg:mb-8">
+            <h2 className="font-heading font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-4">
                 Next 24 Hours
             </h2>
-            <div className="flex gap-2.5 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin">
+            {/* Scroll container: increased padding and gap for larger screens */}
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
                 {hours.map((h, i) => (
                     <motion.div
                         key={h.key}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.02 }}
-                        className={`flex-none w-[78px] rounded-xl border p-3 text-center snap-start transition-colors ${h.isNow
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border bg-card hover:bg-card/80'
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{ delay: i * 0.015, type: 'spring', stiffness: 200, damping: 20 }}
+                        className={`flex-none w-[90px] sm:w-[100px] rounded-2xl border p-3 sm:p-4 text-center snap-start transition-all hover:shadow-md ${h.isNow
+                            ? 'border-primary/50 bg-primary/10 shadow-sm shadow-primary/5'
+                            : 'border-border bg-card/50 hover:bg-card/90 backdrop-blur-sm'
                             }`}
                     >
-                        <div className="text-sm text-muted-foreground font-medium mb-2">{h.label}</div>
-                        <h.IconComp className={`w-7 h-7 mx-auto mb-1.5 ${h.isNow ? 'text-primary' : 'text-foreground/70'}`} />
-                        <div className="text-base font-bold font-mono">{h.temp}°</div>
-                        {h.precip > 0 && (
-                            <div className="flex items-center justify-center gap-0.5 mt-1.5 text-primary">
-                                <Droplets className="w-3 h-3" />
-                                <span className="text-xs font-semibold">{h.precip}%</span>
+                        {/* Time Label */}
+                        <div className={`text-xs sm:text-sm font-medium mb-3 ${h.isNow ? 'text-primary' : 'text-muted-foreground'}`}>
+                            {h.label}
+                        </div>
+
+                        {/* Icon */}
+                        <h.IconComp className={`w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-3 ${h.isNow ? 'text-primary' : 'text-foreground/80'}`} />
+
+                        {/* Temperature */}
+                        <div className="text-lg sm:text-xl font-bold font-mono tracking-tighter">
+                            {h.temp}°
+                        </div>
+
+                        {/* Precipitation */}
+                        {h.precip > 0 ? (
+                            <div className="flex items-center justify-center gap-1 mt-2 text-sky-400">
+                                <Droplets className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                <span className="text-[10px] sm:text-xs font-semibold">{h.precip}%</span>
                             </div>
+                        ) : (
+                            <div className="h-5 sm:h-6 mt-2" /> /* Spacer to keep heights consistent */
                         )}
                     </motion.div>
                 ))}
