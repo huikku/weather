@@ -139,7 +139,7 @@ export function DailyForecast({ weather }) {
                                         transition={{ duration: 0.2 }}
                                         className="overflow-hidden"
                                     >
-                                        <div className="px-4 pb-3 pt-0.5 grid grid-cols-4 gap-2">
+                                        <div className="px-3 sm:px-4 pb-3 pt-0.5 grid grid-cols-2 sm:grid-cols-4 gap-2">
                                             <DetailChip icon={Droplets} label="Precip" value={`${d.precip.toFixed(2)} ${units.precipitation_sum || 'in'}`} />
                                             <DetailChip icon={Snowflake} label="Snow" value={`${d.snow.toFixed(1)} ${units.snowfall_sum || 'in'}`} />
                                             <DetailChip icon={Wind} label="Wind" value={`${Math.round(d.windMax)} ${units.wind_speed_10m_max || 'mp/h'}`} />

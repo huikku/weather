@@ -30,14 +30,14 @@ export function CurrentWeather({ weather, location, units }) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="relative bg-gradient-to-br from-card to-primary/[0.04] border border-border rounded-2xl p-6 mb-5 overflow-hidden"
+            className="relative bg-gradient-to-br from-card to-primary/[0.04] border border-border rounded-2xl p-4 sm:p-6 mb-4 sm:mb-5 overflow-hidden"
         >
             {/* Subtle glow */}
             <div className="absolute -top-1/2 -right-1/3 w-72 h-72 bg-radial from-primary/8 to-transparent pointer-events-none" />
 
             {/* Location */}
             <div className="relative">
-                <h1 className="font-heading font-bold text-2xl tracking-tight">
+                <h1 className="font-heading font-bold text-xl sm:text-2xl tracking-tight">
                     {location?.name || 'Unknown'}
                 </h1>
                 {location?.label && location.label !== location.name && (
@@ -46,14 +46,14 @@ export function CurrentWeather({ weather, location, units }) {
             </div>
 
             {/* Hero temp */}
-            <div className="text-center py-6 relative">
+            <div className="text-center py-4 sm:py-6 relative">
                 <div className="flex items-center justify-center gap-3">
                     <WeatherIcon
                         code={c.weather_code}
                         isDay={c.is_day}
-                        className="w-14 h-14 text-primary drop-shadow-lg"
+                        className="w-10 h-10 sm:w-14 sm:h-14 text-primary drop-shadow-lg"
                     />
-                    <span className="text-7xl font-light tracking-tighter bg-gradient-to-b from-foreground to-muted-foreground bg-clip-text text-transparent">
+                    <span className="text-5xl sm:text-7xl font-light tracking-tighter bg-gradient-to-b from-foreground to-muted-foreground bg-clip-text text-transparent">
                         {Math.round(c.temperature_2m)}°
                     </span>
                 </div>
@@ -64,7 +64,7 @@ export function CurrentWeather({ weather, location, units }) {
             </div>
 
             {/* Detail grid */}
-            <div className="grid grid-cols-3 gap-2.5 relative">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5 relative">
                 {details.map((d, i) => (
                     <motion.div
                         key={d.label}
