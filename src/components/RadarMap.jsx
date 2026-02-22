@@ -149,13 +149,13 @@ export function RadarMap({ lat, lon }) {
                     {mode === 'radar' ? 'Radar' : 'Satellite'}
                 </h2>
 
-                {/* Desktop toggle */}
-                <div className="hidden sm:flex items-center gap-1 bg-card border border-border rounded-lg p-0.5">
+                {/* Toggle */}
+                <div className="flex items-center gap-1 bg-card border border-border rounded-lg p-0.5">
                     <button
                         onClick={() => switchMode('radar')}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${mode === 'radar'
-                                ? 'bg-primary/15 text-primary'
-                                : 'text-muted-foreground hover:text-foreground'
+                            ? 'bg-primary/15 text-primary'
+                            : 'text-muted-foreground hover:text-foreground'
                             }`}
                     >
                         <Radio className="w-3.5 h-3.5" />
@@ -164,22 +164,13 @@ export function RadarMap({ lat, lon }) {
                     <button
                         onClick={() => switchMode('satellite')}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${mode === 'satellite'
-                                ? 'bg-primary/15 text-primary'
-                                : 'text-muted-foreground hover:text-foreground'
+                            ? 'bg-primary/15 text-primary'
+                            : 'text-muted-foreground hover:text-foreground'
                             }`}
                     >
                         <Satellite className="w-3.5 h-3.5" />
                         Satellite
                     </button>
-                </div>
-
-                {/* Mobile mode indicator + swipe hint */}
-                <div className="flex sm:hidden items-center gap-2 text-xs text-muted-foreground">
-                    <div className="flex gap-1">
-                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${mode === 'radar' ? 'bg-primary' : 'bg-border'}`} />
-                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${mode === 'satellite' ? 'bg-primary' : 'bg-border'}`} />
-                    </div>
-                    <span className="opacity-60">swipe</span>
                 </div>
             </div>
 
