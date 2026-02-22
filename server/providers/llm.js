@@ -7,6 +7,7 @@ function buildPrompt(weatherData, alertsData, locationName) {
     const daily = weatherData.daily;
     const hourly = weatherData.hourly;
     const units = weatherData.current_units;
+    const ecmwf = weatherData.ecmwf;
 
     const now = new Date();
     const dayOfWeek = now.toLocaleDateString('en-US', { weekday: 'long' });
@@ -15,39 +16,58 @@ function buildPrompt(weatherData, alertsData, locationName) {
 
     let alertText = '';
     if (alertsData?.alerts?.length > 0) {
-        alertText = `\nACTIVE WEATHER ALERTS:\n${alertsData.alerts.map(a => `- ${a.event}: ${a.headline}`).join('\n')}`;
+        alertText = `\n\nACTIVE WEATHER ALERTS:\n${alertsData.alerts.map(a => `- ${a.event} (${a.severity}): ${a.headline}`).join('\n')}`;
     }
 
     let nwsForecastText = '';
     if (alertsData?.forecast?.length > 0) {
-        nwsForecastText = `\nNWS OFFICIAL FORECAST:\n${alertsData.forecast.map(p => `- ${p.name}: ${p.shortForecast}, ${p.temperature}°${p.temperatureUnit}`).join('\n')}`;
+        nwsForecastText = `\n\nNWS OFFICIAL FORECAST (human-written by meteorologists):\n${alertsData.forecast.map(p => `- ${p.name}: ${p.detailedForecast}`).join('\n')}`;
     }
 
-    return `You are a concise, friendly weather reporter. Write a brief weather narrative for ${locationName}.
+    // Build ECMWF comparison if available
+    let ecmwfComparison = '';
+    if (ecmwf?.daily) {
+        const ecmwfDays = ecmwf.daily.time.slice(0, 7).map((t, i) => {
+            const primaryHigh = daily.temperature_2m_max[i];
+            const primaryLow = daily.temperature_2m_min[i];
+            const ecmwfHigh = ecmwf.daily.temperature_2m_max[i];
+            const ecmwfLow = ecmwf.daily.temperature_2m_min[i];
+            const highDiff = Math.abs(primaryHigh - ecmwfHigh);
+            const dayLabel = new Date(t + 'T12:00').toLocaleDateString('en-US', { weekday: 'short' });
+            return `- ${dayLabel}: Primary H${Math.round(primaryHigh)}°/L${Math.round(primaryLow)}° vs ECMWF H${Math.round(ecmwfHigh)}°/L${Math.round(ecmwfLow)}° ${highDiff > 3 ? '** MODELS DISAGREE **' : '(agreement)'}`;
+        }).join('\n');
+        ecmwfComparison = `\n\nMULTI-MODEL COMPARISON (Primary GFS/HRRR blend vs ECMWF European model):\n${ecmwfDays}`;
+    }
+
+    return `You are an expert meteorologist AI. Analyze weather data from MULTIPLE sources and provide an insightful forecast for ${locationName}.
 It is ${dayOfWeek} ${timeOfDay} in ${month}.
 
-CURRENT CONDITIONS:
+CURRENT CONDITIONS (Open-Meteo, best-available model blend):
 - Temperature: ${c.temperature_2m}${units.temperature_2m}
 - Feels like: ${c.apparent_temperature}${units.apparent_temperature}
 - Humidity: ${c.relative_humidity_2m}%
-- Wind: ${c.wind_speed_10m} ${units.wind_speed_10m}
+- Wind: ${c.wind_speed_10m} ${units.wind_speed_10m} from ${c.wind_direction_10m}°
 - Weather code: ${c.weather_code}
 - Precipitation: ${c.precipitation} ${units.precipitation}
 
-NEXT 12 HOURS TREND:
-${hourly.time.slice(0, 12).map((t, i) => `- ${new Date(t).getHours()}:00 → ${hourly.temperature_2m[i]}${units.temperature_2m}, precip chance ${hourly.precipitation_probability[i]}%`).join('\n')}
+NEXT 12 HOURS (hourly trend):
+${hourly.time.slice(0, 12).map((t, i) => `- ${new Date(t).getHours()}:00 → ${hourly.temperature_2m[i]}${units.temperature_2m}, precip ${hourly.precipitation_probability[i]}%`).join('\n')}
 
-7-DAY OUTLOOK:
-${daily.time.map((t, i) => `- ${new Date(t + 'T12:00').toLocaleDateString('en-US', { weekday: 'short' })}: H ${daily.temperature_2m_max[i]}° / L ${daily.temperature_2m_min[i]}°, precip ${daily.precipitation_probability_max[i]}%, UV ${daily.uv_index_max[i]}`).join('\n')}
-${alertText}${nwsForecastText}
+14-DAY OUTLOOK (Primary model):
+${daily.time.map((t, i) => `- ${new Date(t + 'T12:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}: H ${daily.temperature_2m_max[i]}° / L ${daily.temperature_2m_min[i]}°, precip ${daily.precipitation_probability_max[i]}%, UV ${daily.uv_index_max[i]}`).join('\n')}
+${ecmwfComparison}${alertText}${nwsForecastText}
 
-RULES:
-- Keep it to 3-5 sentences max
-- Be conversational and practical (mention driving conditions, outdoor plans, etc.)
-- If there are alerts, mention them prominently
-- Don't list raw numbers, weave them naturally into prose
+ANALYSIS INSTRUCTIONS:
+- Start with current conditions and immediate outlook (today/tonight)
+- Highlight any significant weather changes or patterns in the coming days
+- When models disagree, mention it and give your best assessment of which is more likely
+- If NWS meteorologist forecasts are available, incorporate their expert analysis
+- If there are alerts, lead with them prominently
+- Mention practical impacts: driving, outdoor plans, what to wear
+- Note any temperature trends (warming/cooling patterns) over the extended forecast
+- Keep it to 4-6 sentences — dense with insight, not filler
 - Don't use emoji or markdown formatting
-- Don't sign off or use a greeting`;
+- Don't sign off or greet`;
 }
 
 async function generateWithGemini(prompt, apiKey) {
@@ -67,7 +87,7 @@ async function generateWithDeepInfra(prompt, apiKey) {
         body: JSON.stringify({
             model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
             messages: [{ role: 'user', content: prompt }],
-            max_tokens: 300,
+            max_tokens: 400,
             temperature: 0.7,
         }),
     });
@@ -79,7 +99,6 @@ async function generateWithDeepInfra(prompt, apiKey) {
 export async function generateReport(weatherData, alertsData, locationName) {
     const prompt = buildPrompt(weatherData, alertsData, locationName);
 
-    // Try Gemini first, fall back to DeepInfra
     const geminiKey = process.env.GEMINI_API_KEY;
     const deepinfraKey = process.env.DEEPINFRA_API_KEY;
 

@@ -1,4 +1,5 @@
 const BASE = 'https://api.open-meteo.com/v1/forecast';
+const ECMWF_BASE = 'https://api.open-meteo.com/v1/ecmwf';
 const GEO_BASE = 'https://geocoding-api.open-meteo.com/v1/search';
 
 export async function fetchWeather(lat, lon, units = 'imperial') {
@@ -6,7 +7,14 @@ export async function fetchWeather(lat, lon, units = 'imperial') {
     const windUnit = units === 'imperial' ? 'mph' : 'kmh';
     const precipUnit = units === 'imperial' ? 'inch' : 'mm';
 
-    const params = new URLSearchParams({
+    const commonDaily = [
+        'weather_code', 'temperature_2m_max', 'temperature_2m_min',
+        'precipitation_probability_max', 'sunrise', 'sunset',
+        'uv_index_max', 'wind_speed_10m_max'
+    ].join(',');
+
+    // Primary forecast (best model blend — GFS/HRRR for US)
+    const primaryParams = new URLSearchParams({
         latitude: lat,
         longitude: lon,
         current: [
@@ -18,22 +26,43 @@ export async function fetchWeather(lat, lon, units = 'imperial') {
             'temperature_2m', 'weather_code', 'precipitation_probability',
             'wind_speed_10m', 'is_day'
         ].join(','),
+        daily: commonDaily,
+        temperature_unit: tempUnit,
+        wind_speed_unit: windUnit,
+        precipitation_unit: precipUnit,
+        timezone: 'auto',
+        forecast_days: 14,
+        forecast_hours: 24,
+    });
+
+    // ECMWF model for comparison (independent European model)
+    const ecmwfParams = new URLSearchParams({
+        latitude: lat,
+        longitude: lon,
         daily: [
             'weather_code', 'temperature_2m_max', 'temperature_2m_min',
-            'precipitation_probability_max', 'sunrise', 'sunset',
-            'uv_index_max', 'wind_speed_10m_max'
         ].join(','),
         temperature_unit: tempUnit,
         wind_speed_unit: windUnit,
         precipitation_unit: precipUnit,
         timezone: 'auto',
-        forecast_days: 7,
-        forecast_hours: 24,
+        forecast_days: 14,
     });
 
-    const res = await fetch(`${BASE}?${params}`);
-    if (!res.ok) throw new Error(`Open-Meteo error: ${res.status}`);
-    return res.json();
+    const [primaryRes, ecmwfRes] = await Promise.all([
+        fetch(`${BASE}?${primaryParams}`),
+        fetch(`${ECMWF_BASE}?${ecmwfParams}`).catch(() => null),
+    ]);
+
+    if (!primaryRes.ok) throw new Error(`Open-Meteo error: ${primaryRes.status}`);
+    const primary = await primaryRes.json();
+
+    let ecmwf = null;
+    if (ecmwfRes?.ok) {
+        ecmwf = await ecmwfRes.json();
+    }
+
+    return { ...primary, ecmwf };
 }
 
 export async function geocodeSearch(query) {
