@@ -55,7 +55,7 @@ export default function App() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-screen flex flex-col">
+    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-screen flex flex-col">
       <div className="max-w-[720px] mx-auto w-full mb-6 relative z-50">
         <SearchBar
           onSelect={handleSelect}
