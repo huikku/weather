@@ -10,7 +10,9 @@ export function HourlyForecast({ weather }) {
     const now = new Date();
     const currentHour = now.getHours();
 
-    // Get next 24 hours
+    // Use window resize or CSS hiding to limit items on desktop, but since we can't easily conditionally slice in React without a resize listener, we'll slice to 24 to keep the scroll, but limit the grid to the first row via CSS, OR slice conditionally based on a breakpoint if possible. The easiest responsive fix without a hook is to slice to 24, but use `auto-cols` grid for overflow. Actually, since the user wants it to look like a full-width dashboard piece on desktop, let's keep all 24 items but update the grid to auto-columns. Let's undo the previous grid change and use a responsive flex behavior instead. 
+
+    // Actually, I just need to return the slice line back to `slice(0, 24)`
     const hours = hourly.time.slice(0, 24).map((time, i) => {
         const date = new Date(time);
         const hour = date.getHours();
@@ -33,15 +35,15 @@ export function HourlyForecast({ weather }) {
             <h2 className="font-heading font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-4">
                 Next 24 Hours
             </h2>
-            {/* Scroll container: increased padding and gap for larger screens */}
-            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+            {/* Scroll container on mobile, full grid on md/lg screens */}
+            <div className="flex md:grid md:grid-cols-6 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
                 {hours.map((h, i) => (
                     <motion.div
                         key={h.key}
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ delay: i * 0.015, type: 'spring', stiffness: 200, damping: 20 }}
-                        className={`flex-none w-[90px] sm:w-[100px] rounded-2xl border p-3 sm:p-4 text-center snap-start transition-all hover:shadow-md ${h.isNow
+                        className={`flex-none w-[90px] md:w-full rounded-2xl border p-3 sm:p-4 text-center snap-start transition-all hover:shadow-md ${h.isNow
                             ? 'border-primary/50 bg-primary/10 shadow-sm shadow-primary/5'
                             : 'border-border bg-card/50 hover:bg-card/90 backdrop-blur-sm'
                             }`}
