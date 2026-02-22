@@ -40,18 +40,18 @@ export function HourlyForecast({ weather }) {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.02 }}
-                        className={`flex-none w-[72px] rounded-xl border p-3 text-center snap-start transition-colors ${h.isNow
-                                ? 'border-primary bg-primary/10'
-                                : 'border-border bg-card hover:bg-card/80'
+                        className={`flex-none w-[78px] rounded-xl border p-3 text-center snap-start transition-colors ${h.isNow
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border bg-card hover:bg-card/80'
                             }`}
                     >
-                        <div className="text-xs text-muted-foreground font-medium mb-2">{h.label}</div>
-                        <h.IconComp className={`w-6 h-6 mx-auto mb-1.5 ${h.isNow ? 'text-primary' : 'text-foreground/70'}`} />
-                        <div className="text-sm font-semibold font-mono">{h.temp}°</div>
+                        <div className="text-sm text-muted-foreground font-medium mb-2">{h.label}</div>
+                        <h.IconComp className={`w-7 h-7 mx-auto mb-1.5 ${h.isNow ? 'text-primary' : 'text-foreground/70'}`} />
+                        <div className="text-base font-bold font-mono">{h.temp}°</div>
                         {h.precip > 0 && (
                             <div className="flex items-center justify-center gap-0.5 mt-1.5 text-primary">
                                 <Droplets className="w-3 h-3" />
-                                <span className="text-[0.65rem] font-medium">{h.precip}%</span>
+                                <span className="text-xs font-semibold">{h.precip}%</span>
                             </div>
                         )}
                     </motion.div>

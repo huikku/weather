@@ -77,43 +77,43 @@ export function DailyForecast({ weather }) {
                             onClick={() => setExpandedDay(isExpanded ? null : d.key)}
                         >
                             {/* Main row — columnar layout */}
-                            <div className="grid grid-cols-[minmax(90px,1fr)_28px_52px_52px_52px_minmax(100px,1.2fr)_20px] items-center gap-x-2 px-4 py-3">
+                            <div className="grid grid-cols-[minmax(90px,1fr)_28px_52px_52px_52px_minmax(100px,1.2fr)_20px] items-center gap-x-2 px-4 py-3.5">
                                 {/* Day */}
                                 <div className="min-w-0">
-                                    <span className="text-sm font-medium">{d.dayName}</span>
-                                    <span className="text-muted-foreground text-xs font-normal ml-1.5">{d.dateStr}</span>
+                                    <span className="text-base font-semibold">{d.dayName}</span>
+                                    <span className="text-muted-foreground text-sm font-normal ml-1.5">{d.dateStr}</span>
                                 </div>
 
                                 {/* Icon */}
-                                <d.IconComp className="w-[18px] h-[18px] text-foreground/60" />
+                                <d.IconComp className="w-5 h-5 text-foreground/60" />
 
                                 {/* Rain */}
                                 <div className="text-center">
                                     {d.precipProb > 0 ? (
-                                        <span className="text-xs text-primary font-medium">{d.precipProb}%</span>
+                                        <span className="text-sm text-primary font-semibold">{d.precipProb}%</span>
                                     ) : (
-                                        <span className="text-xs text-muted-foreground/40">—</span>
+                                        <span className="text-sm text-muted-foreground/40">—</span>
                                     )}
                                 </div>
 
                                 {/* Snow */}
                                 <div className="text-center">
                                     {d.snow > 0 ? (
-                                        <span className="text-xs text-sky-300 font-medium">{d.snow.toFixed(1)}"</span>
+                                        <span className="text-sm text-sky-300 font-semibold">{d.snow.toFixed(1)}"</span>
                                     ) : (
-                                        <span className="text-xs text-muted-foreground/40">—</span>
+                                        <span className="text-sm text-muted-foreground/40">—</span>
                                     )}
                                 </div>
 
                                 {/* Wind */}
                                 <div className="text-center">
-                                    <span className="text-xs text-muted-foreground font-mono">{Math.round(d.windMax)}</span>
+                                    <span className="text-sm text-muted-foreground font-mono">{Math.round(d.windMax)}</span>
                                 </div>
 
                                 {/* Temp range */}
-                                <div className="flex items-center justify-end gap-1.5">
-                                    <span className="text-xs text-muted-foreground font-mono w-7 text-right">{d.low}°</span>
-                                    <div className="w-12 h-1 bg-border rounded-full relative overflow-hidden flex-shrink-0">
+                                <div className="flex items-center justify-end gap-2">
+                                    <span className="text-sm text-muted-foreground font-mono w-8 text-right">{d.low}°</span>
+                                    <div className="w-14 h-1.5 bg-border rounded-full relative overflow-hidden flex-shrink-0">
                                         <motion.div
                                             className="absolute h-full rounded-full bg-gradient-to-r from-primary to-amber-400"
                                             initial={{ width: 0 }}
@@ -122,7 +122,7 @@ export function DailyForecast({ weather }) {
                                             style={{ left: `${d.barLeft}%` }}
                                         />
                                     </div>
-                                    <span className="text-sm font-semibold font-mono w-7">{d.high}°</span>
+                                    <span className="text-base font-bold font-mono w-8">{d.high}°</span>
                                 </div>
 
                                 {/* Chevron */}
@@ -163,11 +163,11 @@ export function DailyForecast({ weather }) {
 
 function DetailChip({ icon: Icon, label, value }) {
     return (
-        <div className="flex items-center gap-2 bg-background/40 rounded-lg px-2.5 py-1.5">
-            <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+        <div className="flex items-center gap-2.5 bg-background/40 rounded-lg px-3 py-2">
+            <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
             <div className="min-w-0">
-                <div className="text-[0.6rem] uppercase tracking-wider text-muted-foreground">{label}</div>
-                <div className="text-xs font-mono font-medium text-foreground truncate">{value}</div>
+                <div className="text-[0.65rem] uppercase tracking-wider text-muted-foreground">{label}</div>
+                <div className="text-sm font-mono font-semibold text-foreground truncate">{value}</div>
             </div>
         </div>
     );

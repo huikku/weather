@@ -73,10 +73,10 @@ export function CurrentWeather({ weather, location, units }) {
                         transition={{ delay: 0.1 + i * 0.05 }}
                         className="glass rounded-xl p-3 text-center hover:bg-white/[0.05] transition-colors"
                     >
-                        <span className="block text-[0.68rem] uppercase tracking-widest text-muted-foreground mb-1">
+                        <span className="block text-xs uppercase tracking-widest text-muted-foreground mb-1">
                             {d.label}
                         </span>
-                        <span className="text-sm font-semibold font-mono">{d.value}</span>
+                        <span className="text-base font-bold font-mono">{d.value}</span>
                     </motion.div>
                 ))}
             </div>
