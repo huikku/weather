@@ -51,10 +51,19 @@ export function useWeather() {
         if (location) loadWeather(location, newUnits);
     }, [units, location, loadWeather]);
 
-    // Load on mount if location is saved
+    // Load on mount and setup auto-refresh every 5 minutes
     useEffect(() => {
-        if (location) loadWeather(location, units);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+        if (!location) return;
+
+        loadWeather(location, units);
+
+        const intervalId = setInterval(() => {
+            console.log('Auto-refreshing weather data...');
+            loadWeather(location, units);
+        }, 5 * 60 * 1000); // 5 minutes
+
+        return () => clearInterval(intervalId);
+    }, [location, units, loadWeather]);
 
     return {
         location, weather, alerts, report, loading, error, units,

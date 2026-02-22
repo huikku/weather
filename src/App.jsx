@@ -55,14 +55,16 @@ export default function App() {
   };
 
   return (
-    <div className="max-w-[720px] mx-auto px-3 sm:px-4 py-3 sm:py-5 min-h-screen flex flex-col">
-      <SearchBar
-        onSelect={handleSelect}
-        units={units}
-        onToggleUnits={toggleUnits}
-        history={history}
-        onClearHistory={clearHistory}
-      />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-screen flex flex-col">
+      <div className="max-w-[720px] mx-auto w-full mb-6 relative z-50">
+        <SearchBar
+          onSelect={handleSelect}
+          units={units}
+          onToggleUnits={toggleUnits}
+          history={history}
+          onClearHistory={clearHistory}
+        />
+      </div>
 
       {loading && <LoadingState />}
 
@@ -72,23 +74,38 @@ export default function App() {
         <motion.main
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex-1"
+          className="flex-1 w-full"
         >
-          <WeatherAlerts alerts={alerts} />
-          <AIReport report={report} />
-          <CurrentWeather weather={weather} location={location} units={units} />
-          {location && <RadarMap lat={location.lat} lon={location.lon} />}
-          <HourlyForecast weather={weather} />
-          <DailyForecast weather={weather} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-6">
+
+            {/* Left Column (Alerts, Current, AI) */}
+            <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
+              <WeatherAlerts alerts={alerts} />
+              <CurrentWeather weather={weather} location={location} units={units} />
+              <AIReport report={report} />
+            </div>
+
+            {/* Middle Column (Radar, Hourly) */}
+            <div className="lg:col-span-5 flex flex-col gap-4 sm:gap-6 order-first md:order-none">
+              {location && <RadarMap lat={location.lat} lon={location.lon} />}
+              <HourlyForecast weather={weather} />
+            </div>
+
+            {/* Right Column (Daily) */}
+            <div className="lg:col-span-3 flex flex-col gap-4 sm:gap-6 md:col-span-2 lg:col-span-3">
+              <DailyForecast weather={weather} />
+            </div>
+
+          </div>
 
           {/* Refresh button */}
-          <div className="flex justify-center py-4">
+          <div className="flex justify-center py-8">
             <button
               onClick={loadWeather}
               className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-primary/5"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              Refresh
+              Refresh Data
             </button>
           </div>
         </motion.main>
