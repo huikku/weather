@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Icons from 'lucide-react';
 import { getWeatherInfo } from '@/lib/weather-codes';
-import { Droplets, Wind, Snowflake, ChevronDown } from 'lucide-react';
+import { Droplets, Wind, Snowflake, ChevronDown, Sun } from 'lucide-react';
 
 export function DailyForecast({ weather }) {
     const [expandedDay, setExpandedDay] = useState(null);
@@ -39,8 +39,7 @@ export function DailyForecast({ weather }) {
         const uvMax = daily.uv_index_max?.[i] || 0;
 
         return {
-            key: time,
-            dayName, dateStr, IconComp, desc,
+            key: time, dayName, dateStr, IconComp, desc,
             high: Math.round(high), low: Math.round(low),
             barLeft, barWidth, isToday,
             precip, snow, precipProb, windMax, gustMax, uvMax,
@@ -52,7 +51,19 @@ export function DailyForecast({ weather }) {
             <h2 className="font-heading font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">
                 14-Day Forecast
             </h2>
-            <div className="flex flex-col gap-1.5">
+
+            {/* Column headers */}
+            <div className="grid grid-cols-[minmax(90px,1fr)_28px_52px_52px_52px_minmax(100px,1.2fr)_20px] items-center gap-x-2 px-4 pb-1.5 text-[0.6rem] uppercase tracking-widest text-muted-foreground/60">
+                <span>Day</span>
+                <span></span>
+                <span className="text-center">Rain</span>
+                <span className="text-center">Snow</span>
+                <span className="text-center">Wind</span>
+                <span className="text-right pr-1">Temp</span>
+                <span></span>
+            </div>
+
+            <div className="flex flex-col gap-1">
                 {days.map((d, i) => {
                     const isExpanded = expandedDay === d.key;
                     return (
@@ -60,59 +71,62 @@ export function DailyForecast({ weather }) {
                             key={d.key}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.03 }}
-                            className={`rounded-xl border overflow-hidden transition-colors cursor-pointer ${d.isToday ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-card/80'
+                            transition={{ delay: i * 0.025 }}
+                            className={`rounded-xl border overflow-hidden transition-colors cursor-pointer ${d.isToday ? 'border-primary/60 bg-primary/8' : 'border-border bg-card hover:bg-card/80'
                                 }`}
                             onClick={() => setExpandedDay(isExpanded ? null : d.key)}
                         >
-                            {/* Main row */}
-                            <div className="grid grid-cols-[1fr_auto_auto_1fr] items-center gap-3 p-3.5 px-4">
-                                {/* Day name */}
-                                <div className="text-sm font-medium">
-                                    {d.dayName}
+                            {/* Main row — columnar layout */}
+                            <div className="grid grid-cols-[minmax(90px,1fr)_28px_52px_52px_52px_minmax(100px,1.2fr)_20px] items-center gap-x-2 px-4 py-3">
+                                {/* Day */}
+                                <div className="min-w-0">
+                                    <span className="text-sm font-medium">{d.dayName}</span>
                                     <span className="text-muted-foreground text-xs font-normal ml-1.5">{d.dateStr}</span>
                                 </div>
 
                                 {/* Icon */}
-                                <d.IconComp className="w-5 h-5 text-foreground/70" />
+                                <d.IconComp className="w-[18px] h-[18px] text-foreground/60" />
 
-                                {/* Quick stats */}
-                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                    {d.precipProb > 0 && (
-                                        <span className="flex items-center gap-0.5 text-primary">
-                                            <Droplets className="w-3 h-3" />
-                                            {d.precipProb}%
-                                        </span>
+                                {/* Rain */}
+                                <div className="text-center">
+                                    {d.precipProb > 0 ? (
+                                        <span className="text-xs text-primary font-medium">{d.precipProb}%</span>
+                                    ) : (
+                                        <span className="text-xs text-muted-foreground/40">—</span>
                                     )}
-                                    {d.snow > 0 && (
-                                        <span className="flex items-center gap-0.5 text-sky-300">
-                                            <Snowflake className="w-3 h-3" />
-                                            {d.snow.toFixed(1)}"
-                                        </span>
+                                </div>
+
+                                {/* Snow */}
+                                <div className="text-center">
+                                    {d.snow > 0 ? (
+                                        <span className="text-xs text-sky-300 font-medium">{d.snow.toFixed(1)}"</span>
+                                    ) : (
+                                        <span className="text-xs text-muted-foreground/40">—</span>
                                     )}
-                                    {d.windMax > 20 && (
-                                        <span className="flex items-center gap-0.5">
-                                            <Wind className="w-3 h-3" />
-                                            {Math.round(d.windMax)}
-                                        </span>
-                                    )}
+                                </div>
+
+                                {/* Wind */}
+                                <div className="text-center">
+                                    <span className="text-xs text-muted-foreground font-mono">{Math.round(d.windMax)}</span>
                                 </div>
 
                                 {/* Temp range */}
-                                <div className="flex items-center justify-end gap-2">
-                                    <span className="text-xs text-muted-foreground font-mono w-8 text-right">{d.low}°</span>
-                                    <div className="w-14 h-1 bg-border rounded-full relative overflow-hidden">
+                                <div className="flex items-center justify-end gap-1.5">
+                                    <span className="text-xs text-muted-foreground font-mono w-7 text-right">{d.low}°</span>
+                                    <div className="w-12 h-1 bg-border rounded-full relative overflow-hidden flex-shrink-0">
                                         <motion.div
                                             className="absolute h-full rounded-full bg-gradient-to-r from-primary to-amber-400"
                                             initial={{ width: 0 }}
-                                            animate={{ width: `${Math.max(d.barWidth, 8)}%` }}
-                                            transition={{ delay: 0.2 + i * 0.03, duration: 0.5 }}
+                                            animate={{ width: `${Math.max(d.barWidth, 10)}%` }}
+                                            transition={{ delay: 0.2 + i * 0.025, duration: 0.4 }}
                                             style={{ left: `${d.barLeft}%` }}
                                         />
                                     </div>
-                                    <span className="text-sm font-semibold font-mono w-8">{d.high}°</span>
-                                    <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                    <span className="text-sm font-semibold font-mono w-7">{d.high}°</span>
                                 </div>
+
+                                {/* Chevron */}
+                                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground/50 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                             </div>
 
                             {/* Expanded detail row */}
@@ -125,14 +139,16 @@ export function DailyForecast({ weather }) {
                                         transition={{ duration: 0.2 }}
                                         className="overflow-hidden"
                                     >
-                                        <div className="px-4 pb-3.5 pt-0.5 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                                            <DetailChip icon={Droplets} label="Precip" value={`${d.precip.toFixed(2)} ${units.precipitation_sum || 'in'}`} show={true} />
-                                            <DetailChip icon={Snowflake} label="Snow" value={`${d.snow.toFixed(1)} ${units.snowfall_sum || 'in'}`} show={true} />
-                                            <DetailChip icon={Wind} label="Wind" value={`${Math.round(d.windMax)} ${units.wind_speed_10m_max || 'mp/h'}`} show={true} />
-                                            <DetailChip icon={Wind} label="Gusts" value={`${Math.round(d.gustMax)} ${units.wind_gusts_10m_max || 'mp/h'}`} show={true} />
+                                        <div className="px-4 pb-3 pt-0.5 grid grid-cols-4 gap-2">
+                                            <DetailChip icon={Droplets} label="Precip" value={`${d.precip.toFixed(2)} ${units.precipitation_sum || 'in'}`} />
+                                            <DetailChip icon={Snowflake} label="Snow" value={`${d.snow.toFixed(1)} ${units.snowfall_sum || 'in'}`} />
+                                            <DetailChip icon={Wind} label="Wind" value={`${Math.round(d.windMax)} ${units.wind_speed_10m_max || 'mp/h'}`} />
+                                            <DetailChip icon={Wind} label="Gusts" value={`${Math.round(d.gustMax)} ${units.wind_gusts_10m_max || 'mp/h'}`} />
                                         </div>
-                                        <div className="px-4 pb-3 text-xs text-muted-foreground">
-                                            {d.desc} · UV {d.uvMax} · Precip chance {d.precipProb}%
+                                        <div className="px-4 pb-3 flex items-center gap-3 text-xs text-muted-foreground">
+                                            <span>{d.desc}</span>
+                                            <span>·</span>
+                                            <span className="flex items-center gap-1"><Sun className="w-3 h-3" /> UV {d.uvMax}</span>
                                         </div>
                                     </motion.div>
                                 )}
@@ -145,14 +161,13 @@ export function DailyForecast({ weather }) {
     );
 }
 
-function DetailChip({ icon: Icon, label, value, show }) {
-    if (!show) return null;
+function DetailChip({ icon: Icon, label, value }) {
     return (
-        <div className="flex items-center gap-2 bg-background/40 rounded-lg px-3 py-2">
+        <div className="flex items-center gap-2 bg-background/40 rounded-lg px-2.5 py-1.5">
             <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-            <div>
-                <div className="text-[0.65rem] uppercase tracking-wider text-muted-foreground">{label}</div>
-                <div className="text-xs font-mono font-medium text-foreground">{value}</div>
+            <div className="min-w-0">
+                <div className="text-[0.6rem] uppercase tracking-wider text-muted-foreground">{label}</div>
+                <div className="text-xs font-mono font-medium text-foreground truncate">{value}</div>
             </div>
         </div>
     );
