@@ -1,6 +1,7 @@
 import { SearchBar } from '@/components/SearchBar';
 import { AIReport } from '@/components/AIReport';
 import { CurrentWeather } from '@/components/CurrentWeather';
+import { RadarMap } from '@/components/RadarMap';
 import { HourlyForecast } from '@/components/HourlyForecast';
 import { DailyForecast } from '@/components/DailyForecast';
 import { WeatherAlerts } from '@/components/WeatherAlerts';
@@ -76,6 +77,7 @@ export default function App() {
           <WeatherAlerts alerts={alerts} />
           <AIReport report={report} />
           <CurrentWeather weather={weather} location={location} units={units} />
+          {location && <RadarMap lat={location.lat} lon={location.lon} />}
           <HourlyForecast weather={weather} />
           <DailyForecast weather={weather} />
 
