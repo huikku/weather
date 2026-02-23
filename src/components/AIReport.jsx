@@ -32,7 +32,7 @@ function formatReport(text) {
         },
         // Wind references
         {
-            pattern: /\b(\d+ mph|wind gusts?|breezy|windy|calm winds?|light winds?)\b/gi,
+            pattern: /\b(\d+ mph|\d+ km\/h|wind gusts?|breezy|windy|calm winds?|light winds?)\b/gi,
             className: 'font-medium text-teal-300',
         },
         // Days of the week — bold white
