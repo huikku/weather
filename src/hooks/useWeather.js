@@ -17,9 +17,10 @@ export function useWeather() {
         return localStorage.getItem('weather-units') || 'imperial';
     });
 
-    const loadWeather = useCallback(async (loc, currentUnits) => {
+    // Core fetch — optionally shows loading spinner
+    const loadWeather = useCallback(async (loc, currentUnits, { silent = false } = {}) => {
         if (!loc) return;
-        setLoading(true);
+        if (!silent) setLoading(true);
         setError(null);
         try {
             const [weatherData, alertsData, reportData] = await Promise.all([
@@ -34,7 +35,7 @@ export function useWeather() {
             setError(err.message);
             console.error('Weather load error:', err);
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     }, []);
 
@@ -44,14 +45,15 @@ export function useWeather() {
         loadWeather(loc, units);
     }, [loadWeather, units]);
 
+    // Toggle units — silent background refresh, no spinner
     const toggleUnits = useCallback(() => {
         const newUnits = units === 'imperial' ? 'metric' : 'imperial';
         setUnits(newUnits);
         localStorage.setItem('weather-units', newUnits);
-        if (location) loadWeather(location, newUnits);
+        if (location) loadWeather(location, newUnits, { silent: true });
     }, [units, location, loadWeather]);
 
-    // Load on mount and setup auto-refresh every 5 minutes
+    // Load on mount (with spinner) and auto-refresh every 5 min (silent)
     useEffect(() => {
         if (!location) return;
 
@@ -59,11 +61,11 @@ export function useWeather() {
 
         const intervalId = setInterval(() => {
             console.log('Auto-refreshing weather data...');
-            loadWeather(location, units);
+            loadWeather(location, units, { silent: true });
         }, 5 * 60 * 1000); // 5 minutes
 
         return () => clearInterval(intervalId);
-    }, [location, units, loadWeather]);
+    }, [location, loadWeather]); // NOTE: removed `units` dep — unit changes handled by toggleUnits
 
     return {
         location, weather, alerts, report, loading, error, units,
