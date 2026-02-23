@@ -1,19 +1,12 @@
 // Service Worker for Weather PWA
 const CACHE_NAME = 'weather-v1';
-const STATIC_ASSETS = [
-    '/',
-    '/manifest.json',
-];
 
-// Install — cache static shell
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
-    );
+// Install — just activate immediately, no precaching in dev
+self.addEventListener('install', () => {
     self.skipWaiting();
 });
 
-// Activate — clean old caches
+// Activate — clean old caches and take control
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keys) =>
@@ -23,17 +16,29 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-// Fetch — network first, cache fallback for navigation
+// Fetch — network only for navigation, cache static assets opportunistically
 self.addEventListener('fetch', (event) => {
     const { request } = event;
 
-    // Skip non-GET and API requests
-    if (request.method !== 'GET' || request.url.includes('/weather/')) return;
+    // Don't cache API calls, non-GET, or chrome-extension requests
+    if (
+        request.method !== 'GET' ||
+        request.url.includes('/weather/') ||
+        request.url.startsWith('chrome-extension')
+    ) return;
 
+    // For navigation (HTML pages) — always go to network
+    if (request.mode === 'navigate') {
+        event.respondWith(
+            fetch(request).catch(() => caches.match('/'))
+        );
+        return;
+    }
+
+    // For static assets — network first, cache fallback
     event.respondWith(
         fetch(request)
             .then((response) => {
-                // Cache successful responses
                 if (response.ok) {
                     const clone = response.clone();
                     caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
