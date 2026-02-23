@@ -88,18 +88,26 @@ function formatReport(text) {
     return parts;
 }
 /**
- * Converts temperature values in report text between F and C.
+ * Converts imperial units in report text to metric for display.
  * Report is always generated in imperial — this converts for display.
  */
 function convertReportUnits(text, units) {
     if (!text || units === 'imperial') return text;
 
     // Convert XX°F → XX°C
-    return text.replace(/-?\d+\.?\d*°F/g, (match) => {
+    let converted = text.replace(/-?\d+\.?\d*°F/g, (match) => {
         const f = parseFloat(match);
         const c = ((f - 32) * 5 / 9).toFixed(0);
         return `${c}°C`;
     });
+
+    // Convert XX mph → XX km/h
+    converted = converted.replace(/(\d+\.?\d*)\s*mph/gi, (match, num) => {
+        const kmh = (parseFloat(num) * 1.60934).toFixed(0);
+        return `${kmh} km/h`;
+    });
+
+    return converted;
 }
 
 export function AIReport({ report, units = 'imperial' }) {
