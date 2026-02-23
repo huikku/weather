@@ -53,7 +53,7 @@ export function DailyForecast({ weather }) {
             </h2>
 
             {/* Column headers */}
-            <div className="grid items-center gap-x-2 px-4 pb-1.5 text-[0.6rem] uppercase tracking-widest text-muted-foreground/60" style={{ gridTemplateColumns: 'minmax(90px, 1fr) 28px 52px 52px 52px minmax(100px, 1.2fr) 20px' }}>
+            <div className="grid items-center gap-x-1.5 px-3 pb-1.5 text-[0.6rem] uppercase tracking-widest text-muted-foreground/60" style={{ gridTemplateColumns: 'minmax(80px, 1fr) 24px 44px 44px 40px minmax(140px, 1.5fr) 16px' }}>
                 <span>Day</span>
                 <span></span>
                 <span className="text-center">Rain</span>
@@ -77,7 +77,7 @@ export function DailyForecast({ weather }) {
                             onClick={() => setExpandedDay(isExpanded ? null : d.key)}
                         >
                             {/* Main row — columnar layout */}
-                            <div className="grid items-center gap-x-2 px-4 py-3.5" style={{ gridTemplateColumns: 'minmax(90px, 1fr) 28px 52px 52px 52px minmax(100px, 1.2fr) 20px' }}>
+                            <div className="grid items-center gap-x-1.5 px-3 py-3.5" style={{ gridTemplateColumns: 'minmax(80px, 1fr) 24px 44px 44px 40px minmax(140px, 1.5fr) 16px' }}>
                                 {/* Day */}
                                 <div className="min-w-0">
                                     <span className="text-base font-semibold">{d.dayName}</span>
