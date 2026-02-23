@@ -87,9 +87,10 @@ export default function App() {
           {/* 3-column grid: Current | Hourly | Daily */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-6">
 
-            {/* Left Column (Current Weather) */}
+            {/* Left Column (Current Weather + Radar) */}
             <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
               <CurrentWeather weather={weather} location={location} units={units} />
+              {location && <RadarMap lat={location.lat} lon={location.lon} />}
             </div>
 
             {/* Middle Column (Hourly) */}
@@ -104,10 +105,7 @@ export default function App() {
 
           </div>
 
-          {/* Radar/Satellite — full width under the forecast */}
-          <div className="mt-4 sm:mt-6">
-            {location && <RadarMap lat={location.lat} lon={location.lon} />}
-          </div>
+
 
           {/* Refresh button */}
           <div className="flex justify-center py-8">
