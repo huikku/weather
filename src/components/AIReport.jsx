@@ -20,9 +20,9 @@ function formatReport(text) {
             pattern: /\b(caution|slippery|icy|freezing rain|black ice|poor visibility|hazard|gusty|gusts up to \d+ mph)\b/gi,
             className: 'font-semibold text-amber-400',
         },
-        // Temperatures (e.g., 28°F, -5°C, mid-40s, upper 50s, low 60s, near zero)
+        // Temperatures (e.g., 28°F, 27.8°F, -5°C, mid-40s, upper 50s, low 60s, near zero)
         {
-            pattern: /(-?\d+°[FC]?|\b(mid|upper|low|lower|high|near)[- ](\d+s|zero|freezing)\b)/gi,
+            pattern: /(-?\d+\.?\d*°[FC]?|\b(mid|upper|low|lower|high|near)[- ](\d+s|zero|freezing)\b)/gi,
             className: 'font-bold text-cyan-300',
         },
         // Precipitation — sky blue
