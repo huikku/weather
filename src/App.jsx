@@ -8,7 +8,7 @@ import { WeatherAlerts } from '@/components/WeatherAlerts';
 import { useWeather } from '@/hooks/useWeather';
 import { useLocationHistory } from '@/hooks/useLocationHistory';
 import { motion } from 'framer-motion';
-import { CloudSun, Loader2, RefreshCw } from 'lucide-react';
+import { CloudSun, Loader2, RefreshCw, Heart } from 'lucide-react';
 
 function Welcome() {
   return (
@@ -127,15 +127,27 @@ export default function App() {
       )}
 
       <footer className="text-center py-4 sm:py-6 mt-auto text-muted-foreground text-xs">
-        Weather data by{' '}
-        <a href="https://open-meteo.com" target="_blank" rel="noopener" className="text-primary hover:underline">
-          Open-Meteo
-        </a>
-        {' & '}
-        <a href="https://weather.gov" target="_blank" rel="noopener" className="text-primary hover:underline">
-          NWS
-        </a>
-        {' · No ads, no tracking'}
+        <div className="flex items-center justify-center gap-1.5">
+          <span>Weather data by{' '}
+            <a href="https://open-meteo.com" target="_blank" rel="noopener" className="text-primary hover:underline">
+              Open-Meteo
+            </a>
+            {' & '}
+            <a href="https://weather.gov" target="_blank" rel="noopener" className="text-primary hover:underline">
+              NWS
+            </a>
+          </span>
+          <span>·</span>
+          <span>Built by{' '}
+            <a href="https://alienrobot.com/" target="_blank" rel="noopener" className="text-primary hover:underline">
+              Alienrobot LLC
+            </a>
+          </span>
+          <span>·</span>
+          <a href="https://ko-fi.com/alienrobot" target="_blank" rel="noopener" className="text-pink-400 hover:text-pink-300 transition-colors" title="Support on Ko-fi">
+            <Heart className="w-3.5 h-3.5 inline fill-current" />
+          </a>
+        </div>
       </footer>
     </div>
   );
