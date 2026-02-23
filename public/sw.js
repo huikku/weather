@@ -1,50 +1,29 @@
-// Service Worker for Weather PWA
-const CACHE_NAME = 'weather-v1';
+// Cleanup service worker — unregisters itself and clears all caches
+// This fixes any 404s caused by previously cached bad responses
 
-// Install — just activate immediately, no precaching in dev
 self.addEventListener('install', () => {
     self.skipWaiting();
 });
 
-// Activate — clean old caches and take control
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-        )
+        Promise.all([
+            // Clear all caches
+            caches.keys().then((keys) =>
+                Promise.all(keys.map((k) => caches.delete(k)))
+            ),
+            // Unregister this service worker
+            self.registration.unregister(),
+        ]).then(() => {
+            // Refresh all open tabs so they get the clean version
+            self.clients.matchAll().then((clients) => {
+                clients.forEach((client) => client.navigate(client.url));
+            });
+        })
     );
-    self.clients.claim();
 });
 
-// Fetch — network only for navigation, cache static assets opportunistically
-self.addEventListener('fetch', (event) => {
-    const { request } = event;
-
-    // Don't cache API calls, non-GET, or chrome-extension requests
-    if (
-        request.method !== 'GET' ||
-        request.url.includes('/weather/') ||
-        request.url.startsWith('chrome-extension')
-    ) return;
-
-    // For navigation (HTML pages) — always go to network
-    if (request.mode === 'navigate') {
-        event.respondWith(
-            fetch(request).catch(() => caches.match('/'))
-        );
-        return;
-    }
-
-    // For static assets — network first, cache fallback
-    event.respondWith(
-        fetch(request)
-            .then((response) => {
-                if (response.ok) {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-                }
-                return response;
-            })
-            .catch(() => caches.match(request))
-    );
+// Pass everything through to network — don't cache anything
+self.addEventListener('fetch', () => {
+    // Do nothing — let the browser handle it normally
 });
