@@ -76,26 +76,37 @@ export default function App() {
           animate={{ opacity: 1 }}
           className="flex-1 w-full"
         >
+          {/* Alerts — full width */}
+          <WeatherAlerts alerts={alerts} />
+
+          {/* AI Report — full width under search bar */}
+          <div className="mb-4 sm:mb-6">
+            <AIReport report={report} />
+          </div>
+
+          {/* 3-column grid: Current | Hourly | Daily */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-6">
 
-            {/* Left Column (Alerts, Current, AI) */}
+            {/* Left Column (Current Weather) */}
             <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
-              <WeatherAlerts alerts={alerts} />
               <CurrentWeather weather={weather} location={location} units={units} />
-              <AIReport report={report} />
             </div>
 
-            {/* Middle Column (Radar, Hourly) */}
-            <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6 order-first md:order-none">
-              {location && <RadarMap lat={location.lat} lon={location.lon} />}
+            {/* Middle Column (Hourly) */}
+            <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
               <HourlyForecast weather={weather} />
             </div>
 
-            {/* Right Column (Daily) */}
+            {/* Right Column (Daily Forecast) */}
             <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6 md:col-span-2 lg:col-span-4">
               <DailyForecast weather={weather} />
             </div>
 
+          </div>
+
+          {/* Radar/Satellite — full width under the forecast */}
+          <div className="mt-4 sm:mt-6">
+            {location && <RadarMap lat={location.lat} lon={location.lon} />}
           </div>
 
           {/* Refresh button */}
