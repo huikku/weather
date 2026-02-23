@@ -87,8 +87,22 @@ function formatReport(text) {
 
     return parts;
 }
+/**
+ * Converts temperature values in report text between F and C.
+ * Report is always generated in imperial — this converts for display.
+ */
+function convertReportUnits(text, units) {
+    if (!text || units === 'imperial') return text;
 
-export function AIReport({ report }) {
+    // Convert XX°F → XX°C
+    return text.replace(/-?\d+\.?\d*°F/g, (match) => {
+        const f = parseFloat(match);
+        const c = ((f - 32) * 5 / 9).toFixed(0);
+        return `${c}°C`;
+    });
+}
+
+export function AIReport({ report, units = 'imperial' }) {
     if (!report) return null;
 
     // Split report into main forecast and tip lines
@@ -98,7 +112,7 @@ export function AIReport({ report }) {
         { emoji: '🌿', key: 'allergy', label: 'Allergy', color: 'text-lime-300', bg: 'bg-lime-400/10 border-lime-400/20' },
     ];
 
-    let mainText = report;
+    let mainText = convertReportUnits(report, units);
     const tips = [];
 
     for (const tip of tipPatterns) {

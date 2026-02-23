@@ -81,7 +81,7 @@ export default function App() {
 
           {/* AI Report — full width under search bar */}
           <div className="mb-4 sm:mb-6">
-            <AIReport report={report} />
+            <AIReport report={report} units={units} />
           </div>
 
           {/* 3-column grid: Current | Hourly | Daily */}
