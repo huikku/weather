@@ -3,7 +3,15 @@ import { fetchWeather, fetchAlerts, fetchReport } from '@/lib/api';
 
 export function useWeather() {
     const [location, setLocation] = useState(() => {
+        // URL params take priority over localStorage
         try {
+            const params = new URLSearchParams(window.location.search);
+            const lat = params.get('lat');
+            const lon = params.get('lon');
+            const name = params.get('name');
+            if (lat && lon) {
+                return { lat: parseFloat(lat), lon: parseFloat(lon), name: name || 'Unknown' };
+            }
             const saved = localStorage.getItem('weather-location');
             return saved ? JSON.parse(saved) : null;
         } catch { return null; }
@@ -16,6 +24,16 @@ export function useWeather() {
     const [units, setUnits] = useState(() => {
         return localStorage.getItem('weather-units') || 'imperial';
     });
+
+    // Update the browser URL with current location (without reloading)
+    const updateURL = useCallback((loc) => {
+        if (!loc) return;
+        const url = new URL(window.location);
+        url.searchParams.set('lat', loc.lat.toFixed(4));
+        url.searchParams.set('lon', loc.lon.toFixed(4));
+        url.searchParams.set('name', loc.name || 'Unknown');
+        window.history.replaceState({}, '', url);
+    }, []);
 
     // Core fetch — optionally shows loading spinner, optionally skips report
     const loadWeather = useCallback(async (loc, currentUnits, { silent = false, skipReport = false } = {}) => {
@@ -45,8 +63,9 @@ export function useWeather() {
     const selectLocation = useCallback((loc) => {
         setLocation(loc);
         localStorage.setItem('weather-location', JSON.stringify(loc));
+        updateURL(loc);
         loadWeather(loc, units);
-    }, [loadWeather, units]);
+    }, [loadWeather, units, updateURL]);
 
     // Toggle units — only re-fetch weather data, keep the report as-is
     const toggleUnits = useCallback(() => {
@@ -60,6 +79,8 @@ export function useWeather() {
     useEffect(() => {
         if (!location) return;
 
+        // Sync URL on mount (covers URL-param-loaded locations)
+        updateURL(location);
         loadWeather(location, units);
 
         const intervalId = setInterval(() => {
@@ -68,7 +89,7 @@ export function useWeather() {
         }, 5 * 60 * 1000); // 5 minutes
 
         return () => clearInterval(intervalId);
-    }, [location, loadWeather]); // NOTE: removed `units` dep — unit changes handled by toggleUnits
+    }, [location, loadWeather, updateURL]); // NOTE: removed `units` dep — unit changes handled by toggleUnits
 
     return {
         location, weather, alerts, report, loading, error, units,
