@@ -17,20 +17,23 @@ export function useWeather() {
         return localStorage.getItem('weather-units') || 'imperial';
     });
 
-    // Core fetch — optionally shows loading spinner
-    const loadWeather = useCallback(async (loc, currentUnits, { silent = false } = {}) => {
+    // Core fetch — optionally shows loading spinner, optionally skips report
+    const loadWeather = useCallback(async (loc, currentUnits, { silent = false, skipReport = false } = {}) => {
         if (!loc) return;
         if (!silent) setLoading(true);
         setError(null);
         try {
-            const [weatherData, alertsData, reportData] = await Promise.all([
+            const fetches = [
                 fetchWeather(loc.lat, loc.lon, currentUnits),
                 fetchAlerts(loc.lat, loc.lon),
-                fetchReport(loc.lat, loc.lon, loc.name, currentUnits),
-            ]);
-            setWeather(weatherData);
-            setAlerts(alertsData);
-            setReport(reportData.report);
+            ];
+            // Always generate report in imperial for best quality
+            if (!skipReport) fetches.push(fetchReport(loc.lat, loc.lon, loc.name, 'imperial'));
+
+            const results = await Promise.all(fetches);
+            setWeather(results[0]);
+            setAlerts(results[1]);
+            if (!skipReport) setReport(results[2].report);
         } catch (err) {
             setError(err.message);
             console.error('Weather load error:', err);
@@ -45,12 +48,12 @@ export function useWeather() {
         loadWeather(loc, units);
     }, [loadWeather, units]);
 
-    // Toggle units — silent background refresh, no spinner
+    // Toggle units — only re-fetch weather data, keep the report as-is
     const toggleUnits = useCallback(() => {
         const newUnits = units === 'imperial' ? 'metric' : 'imperial';
         setUnits(newUnits);
         localStorage.setItem('weather-units', newUnits);
-        if (location) loadWeather(location, newUnits, { silent: true });
+        if (location) loadWeather(location, newUnits, { silent: true, skipReport: true });
     }, [units, location, loadWeather]);
 
     // Load on mount (with spinner) and auto-refresh every 5 min (silent)
