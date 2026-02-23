@@ -107,6 +107,16 @@ function convertReportUnits(text, units) {
         return `${kmh} km/h`;
     });
 
+    // Convert XX inch(es) / XX" → XX cm
+    converted = converted.replace(/(\d+\.?\d*)\s*inch(es)?/gi, (match, num) => {
+        const cm = (parseFloat(num) * 2.54).toFixed(1);
+        return `${cm} cm`;
+    });
+    converted = converted.replace(/(\d+\.?\d*)"/g, (match, num) => {
+        const cm = (parseFloat(num) * 2.54).toFixed(1);
+        return `${cm} cm`;
+    });
+
     return converted;
 }
 
